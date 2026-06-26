@@ -1,0 +1,2703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Pixel's AI Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & BASE ── */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Quicksand', sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+      background: #87CEEB;
+      color: #1a1a2e;
+    }
+    #app {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ── HOME SCREEN (fully responsive) ── */
+    #home-screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #74b9ff 0%, #a8d8ea 40%, #55efc4 65%, #00b894 100%);
+      padding: 8px;
+      z-index: 200;
+      transition: opacity 0.6s, transform 0.6s, background 0.8s;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #home-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.95);
+    }
+    /* Home page decorations */
+    #home-screen .home-deco {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+    }
+    #home-screen .home-deco.tree1 {
+      bottom: 5%;
+      left: 2%;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+    }
+    #home-screen .home-deco.tree2 {
+      bottom: 4%;
+      right: 3%;
+      font-size: clamp(2.2rem, 7vw, 4.5rem);
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+    }
+    #home-screen .home-deco.cloud1 {
+      top: 6%;
+      left: 4%;
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      animation: float-cloud 16s ease-in-out infinite alternate;
+      filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.3));
+    }
+    #home-screen .home-deco.cloud2 {
+      top: 12%;
+      right: 8%;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      animation: float-cloud 20s ease-in-out infinite alternate-reverse;
+      filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.3));
+    }
+    #home-screen .home-deco.sun {
+      top: 1%;
+      right: 3%;
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      animation: spin-sun 24s linear infinite;
+      filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.3));
+    }
+    #home-screen .home-deco.flower1 {
+      bottom: 8%;
+      left: 14%;
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      animation: sway 3s ease-in-out infinite alternate;
+    }
+    #home-screen .home-deco.flower2 {
+      bottom: 10%;
+      right: 18%;
+      font-size: clamp(1.2rem, 3.5vw, 2rem);
+      animation: sway 3.6s ease-in-out infinite alternate-reverse;
+    }
+    #home-screen .home-deco.bush {
+      bottom: 4%;
+      left: 24%;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      opacity: 0.6;
+    }
+    #home-screen .home-deco.bush2 {
+      bottom: 6%;
+      right: 26%;
+      font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+      opacity: 0.5;
+    }
+    /* floating emojis */
+    #home-screen .home-float-emoji {
+      position: absolute;
+      pointer-events: none;
+      font-size: clamp(1.5rem, 4vw, 2.5rem);
+      opacity: 0.12;
+      animation: float-emoji 12s ease-in-out infinite alternate;
+      z-index: 1;
+    }
+    #home-screen .home-float-emoji:nth-child(9) { top: 6%; left: 6%; animation-delay: 0s; font-size: clamp(2rem, 5vw, 3.5rem); }
+    #home-screen .home-float-emoji:nth-child(10) { top: 18%; right: 8%; animation-delay: 2s; font-size: clamp(1.8rem, 4.5vw, 3rem); }
+    #home-screen .home-float-emoji:nth-child(11) { bottom: 20%; left: 8%; animation-delay: 4s; font-size: clamp(1.6rem, 4vw, 2.8rem); }
+    #home-screen .home-float-emoji:nth-child(12) { bottom: 30%; right: 4%; animation-delay: 1s; font-size: clamp(2.2rem, 6vw, 4rem); }
+    #home-screen .home-float-emoji:nth-child(13) { top: 45%; left: 2%; animation-delay: 3s; font-size: clamp(1.4rem, 3.5vw, 2.5rem); }
+    #home-screen .home-float-emoji:nth-child(14) { top: 60%; right: 2%; animation-delay: 5s; font-size: clamp(1.6rem, 4vw, 2.8rem); }
+
+    @keyframes float-emoji {
+      0% { transform: translateY(0) rotate(0deg) scale(1); }
+      100% { transform: translateY(-30px) rotate(12deg) scale(1.05); }
+    }
+    @keyframes float-cloud {
+      0% { transform: translateX(0) scale(1); }
+      100% { transform: translateX(60px) scale(1.05); }
+    }
+    @keyframes spin-sun {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    @keyframes sway {
+      0% { transform: rotate(-8deg); }
+      100% { transform: rotate(8deg); }
+    }
+
+    .home-content {
+      max-width: 960px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: clamp(30px, 8vw, 60px);
+      padding: clamp(16px, 4vw, 30px) clamp(12px, 3vw, 30px) clamp(20px, 5vw, 40px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 16px 60px rgba(0, 0, 0, 0.08);
+      max-height: 95vh;
+      overflow-y: auto;
+      margin: 8px 0;
+      -webkit-overflow-scrolling: touch;
+    }
+    .home-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .home-content::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+    }
+    .home-content::-webkit-scrollbar-thumb {
+      background: rgba(255, 215, 0, 0.4);
+      border-radius: 10px;
+    }
+    .home-content::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 215, 0, 0.6);
+    }
+
+    /* Pixel mascot */
+    .home-mascot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(8px, 2vw, 20px);
+      margin-bottom: 6px;
+      position: relative;
+      flex-wrap: wrap;
+    }
+    .home-mascot .robot-emoji {
+      font-size: clamp(3.5rem, 12vw, 6rem);
+      animation: bounce-robot 2s ease-in-out infinite;
+      filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.15));
+      transition: transform 0.2s;
+    }
+    .home-mascot .robot-emoji:hover {
+      transform: scale(1.05) rotate(-5deg);
+    }
+    @keyframes bounce-robot {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-16px) scale(1.04); }
+    }
+    .home-mascot .speech-bubble-home {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      padding: clamp(8px, 2vw, 14px) clamp(14px, 3vw, 28px);
+      border-radius: 50px 50px 50px 8px;
+      border: 3px solid #ffd700;
+      color: #1a1a2e;
+      font-weight: 700;
+      font-size: clamp(1rem, 3vw, 1.5rem);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      position: relative;
+      max-width: 90vw;
+      min-width: 120px;
+    }
+    .home-mascot .speech-bubble-home::after {
+      content: '';
+      position: absolute;
+      bottom: -14px;
+      left: 35px;
+      border: 10px solid transparent;
+      border-top-color: #ffd700;
+      border-bottom: 0;
+    }
+    .home-mascot .speech-bubble-home .highlight {
+      color: #e17055;
+    }
+
+    .home-title {
+      font-size: clamp(1.8rem, 6vw, 3.2rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #fdcb6e, #e17055);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-top: -4px;
+      letter-spacing: 1px;
+      filter: drop-shadow(0 4px 12px rgba(253, 203, 110, 0.2));
+    }
+    .home-sub {
+      font-size: clamp(0.85rem, 2.2vw, 1.15rem);
+      color: #2d3436;
+      margin-bottom: clamp(16px, 4vw, 28px);
+      font-weight: 600;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+      background: rgba(255, 255, 255, 0.5);
+      padding: 6px clamp(10px, 2vw, 20px);
+      border-radius: 40px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* Concept cards */
+    .concept-grid-home {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 25vw, 200px), 1fr));
+      gap: clamp(12px, 3vw, 24px);
+      margin: clamp(12px, 3vw, 20px) 0 clamp(16px, 4vw, 28px);
+    }
+    .concept-card-home {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: clamp(20px, 5vw, 28px);
+      padding: clamp(16px, 3vw, 24px) clamp(12px, 2vw, 16px) clamp(14px, 2.5vw, 20px);
+      border: 3px solid rgba(255, 215, 0, 0.3);
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      min-height: clamp(140px, 25vh, 190px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    }
+    .concept-card-home::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(255, 215, 0, 0.15), transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .concept-card-home:hover::before {
+      opacity: 1;
+    }
+    .concept-card-home:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.15);
+      border-color: #ffd700;
+      background: rgba(255, 255, 255, 0.95);
+    }
+    .concept-card-home .level-badge {
+      position: absolute;
+      top: clamp(6px, 1.5vw, 12px);
+      left: clamp(6px, 1.5vw, 16px);
+      font-size: clamp(0.55rem, 1.2vw, 0.65rem);
+      font-weight: 800;
+      color: #2d3436;
+      background: rgba(255, 215, 0, 0.3);
+      padding: 2px clamp(8px, 1.5vw, 12px);
+      border-radius: 30px;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(255, 215, 0, 0.2);
+    }
+    .concept-card-home .concept-icon {
+      font-size: clamp(2.2rem, 6vw, 3.4rem);
+      display: block;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.05));
+      transition: transform 0.3s;
+    }
+    .concept-card-home:hover .concept-icon {
+      transform: scale(1.05) rotate(-3deg);
+    }
+    .concept-card-home .concept-name {
+      font-weight: 800;
+      font-size: clamp(0.9rem, 2vw, 1.2rem);
+      margin-bottom: 4px;
+      color: #1a1a2e;
+    }
+    .concept-card-home .concept-desc {
+      font-size: clamp(0.7rem, 1.5vw, 0.88rem);
+      color: #636e72;
+      line-height: 1.4;
+      margin-bottom: 8px;
+      flex: 1;
+    }
+    .concept-card-home .badge-play {
+      display: inline-block;
+      font-size: clamp(0.6rem, 1.2vw, 0.7rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #00b894, #00a381);
+      color: #fff;
+      padding: 3px clamp(10px, 2vw, 18px);
+      border-radius: 40px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 4px 16px rgba(0, 184, 148, 0.25);
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .concept-card-home:hover .badge-play {
+      transform: scale(1.05);
+      box-shadow: 0 6px 24px rgba(0, 184, 148, 0.4);
+    }
+    .concept-card-home.playable {
+      border-color: rgba(255, 215, 0, 0.4);
+      background: rgba(255, 255, 255, 0.9);
+    }
+    .concept-card-home.playable:hover {
+      border-color: #ffd700;
+      background: #fff;
+    }
+
+    /* Home Footer */
+    .home-footer {
+      margin-top: 8px;
+      font-size: clamp(0.75rem, 1.8vw, 0.9rem);
+      color: #2d3436;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(8px, 2vw, 16px);
+      flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 6px clamp(10px, 2vw, 20px);
+      border-radius: 40px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .home-footer .key-hint {
+      background: rgba(255, 255, 255, 0.4);
+      padding: 2px clamp(8px, 1.5vw, 14px);
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: clamp(0.65rem, 1.4vw, 0.8rem);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #1a1a2e;
+    }
+    .home-footer .key-hint kbd {
+      background: rgba(0, 0, 0, 0.05);
+      padding: 0 6px;
+      border-radius: 6px;
+      color: #e17055;
+    }
+
+    /* ── THEME OVERRIDES FOR HOME ── */
+    body.theme-night #home-screen {
+      background: linear-gradient(180deg, #0c1445 0%, #1a1a4e 40%, #1a3a2a 65%, #0d2a1a 100%);
+    }
+    body.theme-night .home-content {
+      background: rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+    body.theme-night .home-mascot .speech-bubble-home {
+      background: rgba(20, 20, 50, 0.92);
+      border-color: #6c5ce7;
+      color: #dfe6e9;
+    }
+    body.theme-night .home-mascot .speech-bubble-home::after {
+      border-top-color: #6c5ce7;
+    }
+    body.theme-night .home-sub {
+      background: rgba(0, 0, 0, 0.3);
+      color: #dfe6e9;
+    }
+    body.theme-night .concept-card-home {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #dfe6e9;
+    }
+    body.theme-night .concept-card-home .concept-name {
+      color: #dfe6e9;
+    }
+    body.theme-night .concept-card-home .concept-desc {
+      color: #b2bec3;
+    }
+    body.theme-night .concept-card-home:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #6c5ce7;
+    }
+    body.theme-night .concept-card-home .level-badge {
+      background: rgba(108, 92, 231, 0.3);
+      color: #a29bfe;
+    }
+    body.theme-night .home-footer {
+      background: rgba(0, 0, 0, 0.3);
+      color: #dfe6e9;
+    }
+    body.theme-night .home-footer .key-hint {
+      background: rgba(255, 255, 255, 0.05);
+      color: #b2bec3;
+    }
+    body.theme-night .home-footer .key-hint kbd {
+      color: #a29bfe;
+    }
+
+    body.theme-gaming #home-screen {
+      background: linear-gradient(180deg, #0a0a1a 0%, #1a0a2a 40%, #0a1a1a 65%, #0d0d0d 100%);
+      box-shadow: inset 0 0 120px rgba(0, 255, 255, 0.05);
+    }
+    body.theme-gaming .home-content {
+      background: rgba(0, 0, 0, 0.4);
+      border-color: #00ffff;
+      box-shadow: 0 0 60px rgba(0, 255, 255, 0.05);
+    }
+    body.theme-gaming .home-mascot .speech-bubble-home {
+      background: rgba(0, 255, 255, 0.08);
+      border-color: #00ffff;
+      color: #00ffff;
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.05);
+    }
+    body.theme-gaming .home-mascot .speech-bubble-home::after {
+      border-top-color: #00ffff;
+    }
+    body.theme-gaming .home-title {
+      background: linear-gradient(135deg, #00ffff, #ff00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    body.theme-gaming .home-sub {
+      background: rgba(0, 0, 0, 0.3);
+      color: #00ffff;
+    }
+    body.theme-gaming .concept-card-home {
+      background: rgba(0, 255, 255, 0.04);
+      border-color: rgba(0, 255, 255, 0.15);
+      color: #00ffff;
+    }
+    body.theme-gaming .concept-card-home .concept-name {
+      color: #00ffff;
+    }
+    body.theme-gaming .concept-card-home .concept-desc {
+      color: #81ecec;
+    }
+    body.theme-gaming .concept-card-home:hover {
+      background: rgba(0, 255, 255, 0.08);
+      border-color: #ff00ff;
+    }
+    body.theme-gaming .concept-card-home .level-badge {
+      background: rgba(255, 0, 255, 0.2);
+      color: #ff00ff;
+    }
+    body.theme-gaming .badge-play {
+      background: linear-gradient(135deg, #ff00ff, #b300b3);
+      box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+    }
+    body.theme-gaming .home-footer {
+      background: rgba(0, 0, 0, 0.3);
+      color: #00ffff;
+    }
+    body.theme-gaming .home-footer .key-hint {
+      background: rgba(0, 255, 255, 0.05);
+      color: #81ecec;
+      border-color: rgba(0, 255, 255, 0.1);
+    }
+    body.theme-gaming .home-footer .key-hint kbd {
+      color: #ff00ff;
+    }
+    /* override sun/clouds for home */
+    body.theme-night .home-deco.sun { content: '🌙'; }
+    body.theme-night .home-deco.cloud1, body.theme-night .home-deco.cloud2 { content: '🌙'; }
+    body.theme-gaming .home-deco.sun { content: '🕹️'; }
+    body.theme-gaming .home-deco.cloud1, body.theme-gaming .home-deco.cloud2 { content: '💾'; }
+
+    /* ── GAME SCREEN (responsive) ── */
+    #game-screen {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      transition: opacity 0.6s;
+      background: #87CEEB;
+    }
+    #game-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Top Bar */
+    #top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: clamp(6px, 1.5vw, 10px) clamp(10px, 2vw, 20px);
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 3px solid rgba(255, 255, 255, 0.4);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      gap: 6px;
+      z-index: 10;
+      min-height: clamp(44px, 10vw, 64px);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    }
+    #top-bar .left,
+    #top-bar .right {
+      display: flex;
+      align-items: center;
+      gap: clamp(4px, 1.5vw, 10px);
+      flex-wrap: wrap;
+    }
+    #top-bar .title {
+      font-weight: 800;
+      font-size: clamp(0.85rem, 2.5vw, 1.3rem);
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      background: linear-gradient(135deg, #fdcb6e, #e17055);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    #top-bar .title span {
+      background: rgba(255, 215, 0, 0.2);
+      padding: 0 clamp(6px, 1.5vw, 12px);
+      border-radius: 30px;
+      -webkit-text-fill-color: #2d3436;
+      background: rgba(255, 215, 0, 0.25);
+      padding: 2px clamp(8px, 1.5vw, 14px);
+      border-radius: 30px;
+    }
+    .theme-btn,
+    .action-btn {
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 700;
+      border: none;
+      border-radius: 40px;
+      padding: clamp(4px, 1vw, 8px) clamp(10px, 2vw, 16px);
+      font-size: clamp(0.6rem, 1.5vw, 0.85rem);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.2s;
+      background: rgba(255, 255, 255, 0.75);
+      color: #1a1a2e;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      touch-action: manipulation;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .theme-btn:active,
+    .action-btn:active {
+      transform: scale(0.92);
+    }
+    .theme-btn.active-theme {
+      background: #ffd700;
+      box-shadow: 0 0 0 3px #fff, 0 0 0 6px #ffd700;
+      color: #1a1a2e;
+    }
+    .action-btn {
+      background: rgba(255, 255, 255, 0.8);
+    }
+    .action-btn.mute {
+      background: rgba(200, 200, 200, 0.7);
+    }
+    #hint-btn {
+      background: #ffeaa7;
+      color: #2d3436;
+    }
+    #hint-btn:hover {
+      background: #fdcb6e;
+    }
+    #concept-btn {
+      background: #a29bfe;
+      color: #fff;
+    }
+    #concept-btn:hover {
+      background: #6c5ce7;
+      transform: translateY(-2px);
+    }
+    #home-btn {
+      background: #fd79a8;
+      color: #fff;
+    }
+    #home-btn:hover {
+      background: #e84393;
+    }
+
+    /* ── PROGRESS ── */
+    #progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: clamp(4px, 1vw, 8px);
+      padding: 2px clamp(8px, 1.5vw, 14px);
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 40px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    .dot {
+      width: clamp(10px, 2vw, 16px);
+      height: clamp(10px, 2vw, 16px);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+    .dot.done {
+      background: #2ecc71;
+      border-color: #27ae60;
+      transform: scale(1.15);
+      box-shadow: 0 0 12px rgba(46, 204, 113, 0.4);
+    }
+    .dot.current {
+      background: #ffd700;
+      border-color: #f39c12;
+      animation: pulse-dot 0.8s infinite alternate;
+      box-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+    }
+    @keyframes pulse-dot {
+      0% {
+        transform: scale(1);
+        box-shadow: 0 0 8px rgba(255, 215, 0, 0.3);
+      }
+      100% {
+        transform: scale(1.4);
+        box-shadow: 0 0 24px rgba(255, 215, 0, 0.7);
+      }
+    }
+
+    /* ── SCENE ── */
+    #scene {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+      background: linear-gradient(180deg, #74b9ff 0%, #a8d8ea 40%, #55efc4 65%, #00b894 100%);
+      transition: background 0.8s;
+      box-shadow: inset 0 0 80px rgba(255, 255, 255, 0.2);
+    }
+    #scene .deco {
+      position: absolute;
+      pointer-events: none;
+      font-size: clamp(1.5rem, 4vw, 3rem);
+    }
+    #scene .deco.tree1 {
+      bottom: 10%;
+      left: 4%;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+    }
+    #scene .deco.tree2 {
+      bottom: 8%;
+      right: 6%;
+      font-size: clamp(2.2rem, 7vw, 4.5rem);
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+    }
+    #scene .deco.cloud1 {
+      top: 8%;
+      left: 6%;
+      font-size: clamp(2rem, 6vw, 3.6rem);
+      animation: float-cloud 16s ease-in-out infinite alternate;
+      filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.3));
+    }
+    #scene .deco.cloud2 {
+      top: 14%;
+      right: 12%;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      animation: float-cloud 20s ease-in-out infinite alternate-reverse;
+      filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.3));
+    }
+    #scene .deco.sun {
+      top: 2%;
+      right: 5%;
+      font-size: clamp(2.5rem, 8vw, 4.5rem);
+      animation: spin-sun 24s linear infinite;
+      filter: drop-shadow(0 0 40px rgba(255, 215, 0, 0.3));
+    }
+    #scene .deco.flower1 {
+      bottom: 12%;
+      left: 18%;
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      animation: sway 3s ease-in-out infinite alternate;
+    }
+    #scene .deco.flower2 {
+      bottom: 14%;
+      right: 22%;
+      font-size: clamp(1.2rem, 3.5vw, 2rem);
+      animation: sway 3.6s ease-in-out infinite alternate-reverse;
+    }
+    #scene .deco.bush {
+      bottom: 8%;
+      left: 28%;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      opacity: 0.6;
+    }
+    #scene .deco.bush2 {
+      bottom: 10%;
+      right: 30%;
+      font-size: clamp(1.6rem, 4.5vw, 2.6rem);
+      opacity: 0.5;
+    }
+
+    /* ── CHARACTERS ── */
+    .char-container {
+      position: absolute;
+      bottom: clamp(12%, 8vh, 20%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.15));
+    }
+    #pixel-area {
+      left: clamp(2%, 3vw, 6%);
+      transform-origin: bottom center;
+    }
+    #pixel-area .char-emoji {
+      font-size: clamp(3rem, 12vw, 6.5rem);
+      line-height: 1;
+      transition: transform 0.3s;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+    }
+    #pixel-area .char-label {
+      font-size: clamp(0.7rem, 1.5vw, 1rem);
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 2px clamp(10px, 2vw, 18px);
+      border-radius: 40px;
+      margin-top: 2px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      white-space: nowrap;
+    }
+
+    #visitor-area {
+      right: clamp(2%, 3vw, 6%);
+      transform-origin: bottom center;
+      transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.5s;
+    }
+    #visitor-area .char-emoji {
+      font-size: clamp(2.8rem, 11vw, 6rem);
+      line-height: 1;
+      transition: transform 0.3s;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15));
+    }
+    #visitor-area .char-label {
+      font-size: clamp(0.65rem, 1.4vw, 0.9rem);
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.85);
+      padding: 2px clamp(8px, 1.5vw, 16px);
+      border-radius: 40px;
+      margin-top: 2px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      white-space: nowrap;
+    }
+    #visitor-area.entering {
+      transform: translateX(120%) scale(0.6);
+      opacity: 0;
+    }
+    #visitor-area.entered {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    #visitor-area.leaving {
+      transform: translateX(-120%) scale(0.6);
+      opacity: 0;
+    }
+
+    #booth {
+      position: absolute;
+      bottom: clamp(10%, 6vh, 16%);
+      left: 1%;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      opacity: 0.6;
+      pointer-events: none;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+    }
+
+    /* ── SPEECH BUBBLE ── */
+    #speech-bubble {
+      position: absolute;
+      top: clamp(6%, 4vh, 10%);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: clamp(10px, 2vw, 18px) clamp(14px, 3vw, 28px);
+      border-radius: 40px 40px 40px 8px;
+      max-width: clamp(280px, 80vw, 74%);
+      min-width: clamp(140px, 40vw, 200px);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
+      text-align: center;
+      transition: opacity 0.4s, transform 0.4s;
+      z-index: 5;
+      pointer-events: none;
+      border: 3px solid #ffd700;
+    }
+    #speech-bubble .speaker-name {
+      font-weight: 800;
+      font-size: clamp(0.7rem, 1.4vw, 0.9rem);
+      color: #6c5ce7;
+      margin-bottom: 2px;
+      letter-spacing: 0.5px;
+    }
+    #speech-bubble .speech-text {
+      font-size: clamp(0.85rem, 2.2vw, 1.2rem);
+      font-weight: 700;
+      line-height: 1.4;
+      color: #1a1a2e;
+      word-break: break-word;
+    }
+    #speech-bubble .speech-text.small {
+      font-size: clamp(0.75rem, 1.8vw, 1rem);
+    }
+    #speech-bubble.hidden {
+      opacity: 0;
+      transform: translateX(-50%) scale(0.9);
+      pointer-events: none;
+    }
+    #speech-bubble::after {
+      content: '';
+      position: absolute;
+      bottom: -18px;
+      left: 40px;
+      border: clamp(8px, 1.5vw, 12px) solid transparent;
+      border-top-color: #ffd700;
+      border-bottom: 0;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.05));
+    }
+    #speech-bubble::before {
+      content: '';
+      position: absolute;
+      bottom: -12px;
+      left: 44px;
+      border: clamp(6px, 1.2vw, 10px) solid transparent;
+      border-top-color: rgba(255, 255, 255, 0.96);
+      border-bottom: 0;
+      z-index: 1;
+    }
+
+    /* ── PIXEL REACTION ── */
+    #pixel-reaction {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      font-size: clamp(3rem, 10vw, 4.5rem);
+      pointer-events: none;
+      z-index: 8;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+      opacity: 0;
+      text-align: center;
+      filter: drop-shadow(0 12px 32px rgba(0, 0, 0, 0.2));
+    }
+    #pixel-reaction.show {
+      transform: translate(-50%, -50%) scale(1);
+      opacity: 1;
+    }
+    #pixel-reaction .reaction-text {
+      font-size: clamp(0.85rem, 2vw, 1.1rem);
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.92);
+      padding: 4px clamp(12px, 2.5vw, 20px);
+      border-radius: 40px;
+      display: block;
+      margin-top: 6px;
+      max-width: 300px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+
+    /* ── TOOLS ── */
+    #tools {
+      position: absolute;
+      bottom: clamp(4px, 1%, 2%);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: clamp(6px, 2vw, 20px);
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: clamp(8px, 1.5vw, 16px) clamp(12px, 3vw, 28px);
+      border-radius: clamp(40px, 10vw, 80px);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.08);
+      z-index: 6;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 95vw;
+    }
+    .tool-btn {
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 800;
+      border: none;
+      border-radius: 60px;
+      padding: clamp(6px, 1.2vw, 12px) clamp(12px, 2.5vw, 24px);
+      font-size: clamp(0.7rem, 1.8vw, 1.05rem);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s, background 0.2s;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1a1a2e;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      gap: clamp(4px, 1vw, 10px);
+      touch-action: manipulation;
+      min-width: clamp(44px, 12vw, 100px);
+      justify-content: center;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+    .tool-btn .tool-icon {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      line-height: 1;
+    }
+    .tool-btn .tool-label {
+      font-size: clamp(0.55rem, 1.2vw, 0.9rem);
+      letter-spacing: 0.3px;
+    }
+    .tool-btn:active {
+      transform: scale(0.92);
+    }
+    .tool-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    }
+    .tool-btn.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+      transform: scale(0.95);
+      filter: grayscale(0.5);
+    }
+    .tool-btn.tool-memory { background: #ffeaa7; border-color: #fdcb6e; }
+    .tool-btn.tool-search { background: #81ecec; border-color: #55efc4; }
+    .tool-btn.tool-research { background: #dfe6e9; border-color: #b2bec3; }
+    .tool-btn.tool-supervised { background: #74b9ff; border-color: #0984e3; }
+    .tool-btn.tool-unsupervised { background: #55efc4; border-color: #00b894; }
+    .tool-btn.tool-reward { background: #ffeaa7; border-color: #fdcb6e; }
+    .tool-btn.tool-punish { background: #fab1a0; border-color: #e17055; }
+    .tool-btn.tool-ignore { background: #dfe6e9; border-color: #b2bec3; }
+    .tool-btn.tool-layers { background: #a29bfe; border-color: #6c5ce7; }
+    .tool-btn.tool-weights { background: #fd79a8; border-color: #e84393; }
+    .tool-btn.tool-activation { background: #fdcb6e; border-color: #f39c12; }
+
+    /* ── HINT POPUP ── */
+    #hint-popup {
+      position: absolute;
+      bottom: clamp(16%, 12vh, 24%);
+      left: 50%;
+      transform: translateX(-50%) scale(0.8);
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: #fff;
+      padding: clamp(10px, 2vw, 16px) clamp(16px, 3vw, 32px);
+      border-radius: 40px;
+      font-weight: 700;
+      font-size: clamp(0.8rem, 1.8vw, 1.05rem);
+      max-width: 85%;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 20;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    }
+    #hint-popup.show {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+    #hint-popup .hint-icon {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    /* ── CONCEPT MODAL ── */
+    #concept-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+      padding: 20px;
+    }
+    #concept-modal.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #concept-modal .modal-content {
+      background: rgba(18, 18, 40, 0.96);
+      border-radius: clamp(30px, 8vw, 60px);
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: clamp(20px, 4vw, 36px) clamp(16px, 3vw, 40px);
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.4);
+      transform: scale(0.9);
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 2px solid rgba(255, 215, 0, 0.2);
+      position: relative;
+    }
+    #concept-modal.show .modal-content {
+      transform: scale(1);
+    }
+    #concept-modal .modal-content::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: clamp(30px, 8vw, 60px);
+      background: radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.05), transparent 70%);
+      pointer-events: none;
+    }
+    #concept-modal .close-modal {
+      position: absolute;
+      top: clamp(8px, 1.5vw, 16px);
+      right: clamp(12px, 2vw, 22px);
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      background: rgba(255, 255, 255, 0.05);
+      border: none;
+      cursor: pointer;
+      color: #b2bec3;
+      transition: transform 0.15s, color 0.15s, background 0.15s;
+      line-height: 1;
+      width: clamp(32px, 6vw, 48px);
+      height: clamp(32px, 6vw, 48px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      z-index: 10;
+    }
+    #concept-modal .close-modal:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      transform: rotate(90deg);
+    }
+    #concept-modal .modal-title {
+      font-size: clamp(1.6rem, 4.5vw, 2.4rem);
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: #fff;
+    }
+    #concept-modal .modal-sub {
+      text-align: center;
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      color: #a29bfe;
+      margin-bottom: clamp(16px, 3vw, 28px);
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+    #concept-modal .concept-grid {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(12px, 2vw, 20px);
+    }
+    #concept-modal .concept-card {
+      border-radius: clamp(16px, 3vw, 24px);
+      padding: clamp(12px, 2vw, 18px) clamp(14px, 2.5vw, 24px);
+      border-left: 8px solid #dfe6e9;
+      transition: transform 0.2s, box-shadow 0.2s;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    #concept-modal .concept-card:hover {
+      transform: translateX(6px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+    #concept-modal .concept-card .card-title {
+      font-weight: 800;
+      font-size: clamp(1.1rem, 2.5vw, 1.3rem);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+    }
+    #concept-modal .concept-card .card-desc {
+      font-size: clamp(0.85rem, 1.8vw, 1rem);
+      margin-top: 4px;
+      color: #dfe6e9;
+      line-height: 1.5;
+    }
+    #concept-modal .concept-card .card-example {
+      font-size: clamp(0.75rem, 1.5vw, 0.9rem);
+      color: #b2bec3;
+      margin-top: 6px;
+      font-style: italic;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 4px clamp(10px, 2vw, 16px);
+      border-radius: 30px;
+      display: inline-block;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    #concept-modal .pixel-advice {
+      text-align: center;
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      font-weight: 700;
+      background: rgba(255, 215, 0, 0.08);
+      padding: clamp(12px, 2vw, 16px) clamp(16px, 3vw, 24px);
+      border-radius: 40px;
+      margin-top: clamp(16px, 3vw, 24px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      border: 2px solid rgba(255, 215, 0, 0.1);
+      color: #ffd700;
+    }
+
+    /* ── GRADUATION ── */
+    #graduation {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s;
+      padding: 20px;
+    }
+    #graduation.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    #graduation .grad-content {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: clamp(40px, 10vw, 80px);
+      padding: clamp(24px, 5vw, 40px) clamp(20px, 4vw, 48px);
+      max-width: 520px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+      transform: scale(0.8);
+      transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border: 6px solid #ffd700;
+    }
+    #graduation.show .grad-content {
+      transform: scale(1);
+    }
+    #graduation .grad-emoji {
+      font-size: clamp(3.5rem, 10vw, 5.5rem);
+      display: block;
+      animation: bounce-grad 0.8s infinite alternate;
+    }
+    @keyframes bounce-grad {
+      0% { transform: translateY(0) scale(1); }
+      100% { transform: translateY(-20px) scale(1.05); }
+    }
+    #graduation .grad-title {
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      font-weight: 800;
+      color: #2d3436;
+      margin: 8px 0 4px;
+    }
+    #graduation .grad-sub {
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+      color: #636e72;
+      margin-bottom: 12px;
+    }
+    #graduation .grad-badge {
+      font-size: clamp(3rem, 8vw, 4.5rem);
+      display: block;
+      margin: 6px 0;
+      filter: drop-shadow(0 4px 12px rgba(255, 215, 0, 0.3));
+    }
+    #grad-replay {
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 800;
+      border: none;
+      background: #6c5ce7;
+      color: #fff;
+      padding: clamp(10px, 2vw, 14px) clamp(24px, 5vw, 40px);
+      border-radius: 60px;
+      font-size: clamp(0.9rem, 2vw, 1.2rem);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+      margin-top: 8px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    #grad-replay:active {
+      transform: scale(0.92);
+    }
+    #grad-replay:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(108, 92, 231, 0.4);
+    }
+
+    /* ── CONFETTI ── */
+    .confetti-piece {
+      position: fixed;
+      pointer-events: none;
+      z-index: 60;
+      font-size: clamp(1.2rem, 3vw, 2.2rem);
+      animation: confetti-fall linear forwards;
+    }
+    @keyframes confetti-fall {
+      0% { transform: translateY(-20vh) rotate(0deg) scale(1); opacity: 1; }
+      100% { transform: translateY(120vh) rotate(720deg) scale(0.3); opacity: 0; }
+    }
+
+    /* ── THEME OVERRIDES FOR GAME ── */
+    body.theme-night #game-screen { background: #0c1445; }
+    body.theme-night #scene { background: linear-gradient(180deg, #0c1445 0%, #1a1a4e 40%, #1a3a2a 65%, #0d2a1a 100%); }
+    body.theme-night #top-bar { background: rgba(0, 0, 0, 0.5); border-bottom-color: rgba(255, 255, 255, 0.1); }
+    body.theme-night #top-bar .title { -webkit-text-fill-color: #dfe6e9; background: none; }
+    body.theme-night #top-bar .title span { background: rgba(255, 255, 255, 0.1); -webkit-text-fill-color: #dfe6e9; }
+    body.theme-night .theme-btn, body.theme-night .action-btn { background: rgba(255, 255, 255, 0.12); color: #dfe6e9; }
+    body.theme-night .theme-btn.active-theme { background: #fdcb6e; color: #1a1a2e; }
+    body.theme-night #speech-bubble { background: rgba(20, 20, 50, 0.92); border-color: #6c5ce7; }
+    body.theme-night #speech-bubble .speech-text { color: #dfe6e9; }
+    body.theme-night #speech-bubble .speaker-name { color: #a29bfe; }
+    body.theme-night #speech-bubble::after { border-top-color: #6c5ce7; }
+    body.theme-night #speech-bubble::before { border-top-color: rgba(20, 20, 50, 0.92); }
+    body.theme-night #tools { background: rgba(0, 0, 0, 0.6); border-color: rgba(255, 255, 255, 0.1); }
+    body.theme-night .tool-btn { background: rgba(255, 255, 255, 0.1); color: #dfe6e9; border-color: rgba(255, 255, 255, 0.05); }
+    body.theme-night .tool-btn.tool-memory { background: rgba(253, 203, 110, 0.2); border-color: rgba(253, 203, 110, 0.3); }
+    body.theme-night .tool-btn.tool-search { background: rgba(85, 239, 196, 0.15); border-color: rgba(85, 239, 196, 0.2); }
+    body.theme-night .tool-btn.tool-research { background: rgba(178, 190, 195, 0.15); border-color: rgba(178, 190, 195, 0.2); }
+    body.theme-night #hint-popup { background: rgba(0, 0, 0, 0.9); border-color: rgba(255, 255, 255, 0.1); }
+    body.theme-night #progress-wrap .dot { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.1); }
+    body.theme-night #progress-wrap .dot.done { background: #00b894; border-color: #00b894; box-shadow: 0 0 16px rgba(0, 184, 148, 0.4); }
+    body.theme-night #progress-wrap .dot.current { background: #fdcb6e; border-color: #fdcb6e; box-shadow: 0 0 20px rgba(253, 203, 110, 0.5); }
+    body.theme-night .char-label { background: rgba(0, 0, 0, 0.6); color: #dfe6e9; border-color: rgba(255, 255, 255, 0.1); }
+    body.theme-night #pixel-reaction .reaction-text { background: rgba(0, 0, 0, 0.8); color: #dfe6e9; border-color: rgba(255, 255, 255, 0.1); }
+    body.theme-night #concept-modal .modal-content { background: rgba(16, 16, 40, 0.96); border-color: #6c5ce7; }
+    body.theme-night #concept-modal .modal-title { color: #dfe6e9; }
+    body.theme-night #concept-modal .modal-sub { color: #a29bfe; }
+    body.theme-night #concept-modal .concept-card { background: rgba(255, 255, 255, 0.04); }
+    body.theme-night #concept-modal .concept-card .card-title { color: #dfe6e9; }
+    body.theme-night #concept-modal .concept-card .card-desc { color: #b2bec3; }
+    body.theme-night #concept-modal .pixel-advice { background: rgba(108, 92, 231, 0.15); border-color: rgba(108, 92, 231, 0.3); color: #a29bfe; }
+    body.theme-night #concept-modal .close-modal { color: #b2bec3; }
+    body.theme-night #concept-modal .close-modal:hover { color: #fff; background: rgba(255, 255, 255, 0.05); }
+    body.theme-night #graduation .grad-content { background: rgba(16, 16, 40, 0.95); border-color: #6c5ce7; color: #dfe6e9; }
+    body.theme-night #graduation .grad-title { color: #dfe6e9; }
+    body.theme-night #graduation .grad-sub { color: #b2bec3; }
+
+    body.theme-gaming #game-screen { background: #0a0a1a; }
+    body.theme-gaming #scene { background: linear-gradient(180deg, #0a0a1a 0%, #1a0a2a 40%, #0a1a1a 65%, #0d0d0d 100%); box-shadow: inset 0 0 120px rgba(0, 255, 255, 0.05); }
+    body.theme-gaming #top-bar { background: rgba(0, 255, 255, 0.08); border-bottom: 3px solid #00ffff; box-shadow: 0 0 40px rgba(0, 255, 255, 0.05); }
+    body.theme-gaming #top-bar .title { -webkit-text-fill-color: #00ffff; background: none; }
+    body.theme-gaming #top-bar .title span { background: rgba(0, 255, 255, 0.1); -webkit-text-fill-color: #00ffff; }
+    body.theme-gaming .theme-btn, body.theme-gaming .action-btn { background: rgba(0, 255, 255, 0.1); color: #00ffff; border: 1px solid rgba(0, 255, 255, 0.2); box-shadow: 0 0 20px rgba(0, 255, 255, 0.03); }
+    body.theme-gaming .theme-btn.active-theme { background: #ff00ff; color: #fff; border-color: #ff00ff; box-shadow: 0 0 30px rgba(255, 0, 255, 0.3); }
+    body.theme-gaming #speech-bubble { background: rgba(8, 8, 28, 0.94); border: 3px solid #00ffff; box-shadow: 0 0 60px rgba(0, 255, 255, 0.1); }
+    body.theme-gaming #speech-bubble .speech-text { color: #00ffff; }
+    body.theme-gaming #speech-bubble .speaker-name { color: #ff00ff; }
+    body.theme-gaming #speech-bubble::after { border-top-color: #00ffff; }
+    body.theme-gaming #speech-bubble::before { border-top-color: rgba(8, 8, 28, 0.94); }
+    body.theme-gaming #tools { background: rgba(0, 0, 0, 0.7); border: 3px solid #ff00ff; box-shadow: 0 0 60px rgba(255, 0, 255, 0.05); }
+    body.theme-gaming .tool-btn { background: rgba(0, 255, 255, 0.06); color: #00ffff; border: 2px solid rgba(0, 255, 255, 0.15); font-family: 'Quicksand', monospace; }
+    body.theme-gaming .tool-btn.tool-memory { background: rgba(255, 215, 0, 0.12); border-color: rgba(255, 215, 0, 0.3); }
+    body.theme-gaming .tool-btn.tool-search { background: rgba(0, 255, 255, 0.12); border-color: rgba(0, 255, 255, 0.3); }
+    body.theme-gaming .tool-btn.tool-research { background: rgba(255, 0, 255, 0.12); border-color: rgba(255, 0, 255, 0.3); }
+    body.theme-gaming #hint-popup { background: rgba(0, 0, 0, 0.9); border: 2px solid #ff00ff; box-shadow: 0 0 40px rgba(255, 0, 255, 0.1); color: #00ffff; }
+    body.theme-gaming #progress-wrap .dot { background: rgba(0, 255, 255, 0.12); border-color: rgba(0, 255, 255, 0.15); }
+    body.theme-gaming #progress-wrap .dot.done { background: #00ff00; border-color: #00ff00; box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); }
+    body.theme-gaming #progress-wrap .dot.current { background: #ff00ff; border-color: #ff00ff; box-shadow: 0 0 24px rgba(255, 0, 255, 0.4); }
+    body.theme-gaming .char-label { background: rgba(0, 0, 0, 0.7); color: #00ffff; border: 2px solid rgba(0, 255, 255, 0.2); }
+    body.theme-gaming #pixel-reaction .reaction-text { background: rgba(0, 0, 0, 0.8); color: #00ffff; border: 2px solid rgba(0, 255, 255, 0.2); }
+    body.theme-gaming #booth { filter: drop-shadow(0 0 30px rgba(255, 0, 255, 0.2)); }
+    body.theme-gaming #concept-modal .modal-content { background: rgba(8, 8, 28, 0.95); border-color: #ff00ff; }
+    body.theme-gaming #concept-modal .modal-title { color: #00ffff; }
+    body.theme-gaming #concept-modal .modal-sub { color: #ff00ff; }
+    body.theme-gaming #concept-modal .concept-card { background: rgba(0, 255, 255, 0.04); border-color: rgba(0, 255, 255, 0.1); }
+    body.theme-gaming #concept-modal .concept-card .card-title { color: #00ffff; }
+    body.theme-gaming #concept-modal .concept-card .card-desc { color: #b2bec3; }
+    body.theme-gaming #concept-modal .concept-card .card-example { color: #81ecec; background: rgba(0, 0, 0, 0.3); }
+    body.theme-gaming #concept-modal .pixel-advice { background: rgba(255, 0, 255, 0.1); border-color: rgba(255, 0, 255, 0.3); color: #00ffff; }
+    body.theme-gaming #concept-modal .close-modal { color: #00ffff; }
+    body.theme-gaming #concept-modal .close-modal:hover { color: #fff; background: rgba(0, 255, 255, 0.05); }
+    body.theme-gaming #graduation .grad-content { background: rgba(8, 8, 28, 0.95); border-color: #ff00ff; color: #00ffff; }
+    body.theme-gaming #graduation .grad-title { color: #00ffff; }
+    body.theme-gaming #graduation .grad-sub { color: #b2bec3; }
+    body.theme-gaming #grad-replay { background: #ff00ff; box-shadow: 0 0 30px rgba(255, 0, 255, 0.3); }
+
+    /* ── EXTRA RESPONSIVE TWEAKS ── */
+    @media (max-width: 480px) {
+      .home-content {
+        padding: 12px 8px 16px;
+        border-radius: 30px;
+      }
+      .home-mascot .speech-bubble-home {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+        max-width: 200px;
+      }
+      .concept-grid-home {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .concept-card-home {
+        min-height: 120px;
+        padding: 12px 8px 14px;
+      }
+      .concept-card-home .concept-icon {
+        font-size: 2rem;
+      }
+      .concept-card-home .concept-name {
+        font-size: 0.8rem;
+      }
+      .concept-card-home .concept-desc {
+        font-size: 0.65rem;
+      }
+      .concept-card-home .badge-play {
+        font-size: 0.55rem;
+        padding: 2px 10px;
+      }
+      .concept-card-home .level-badge {
+        font-size: 0.5rem;
+        top: 6px;
+        left: 8px;
+      }
+      .home-footer {
+        font-size: 0.7rem;
+        padding: 4px 12px;
+        gap: 6px;
+      }
+      .home-footer .key-hint {
+        font-size: 0.6rem;
+      }
+      #top-bar .title {
+        font-size: 0.75rem;
+      }
+      .theme-btn, .action-btn {
+        font-size: 0.55rem;
+        padding: 4px 8px;
+      }
+      #tools {
+        padding: 6px 8px;
+        gap: 4px;
+        border-radius: 30px;
+      }
+      .tool-btn {
+        padding: 4px 8px;
+        min-width: 40px;
+        font-size: 0.6rem;
+        gap: 3px;
+      }
+      .tool-btn .tool-icon {
+        font-size: 1rem;
+      }
+      .tool-btn .tool-label {
+        font-size: 0.5rem;
+      }
+      #pixel-area .char-emoji {
+        font-size: 3rem;
+      }
+      #visitor-area .char-emoji {
+        font-size: 2.8rem;
+      }
+      #speech-bubble {
+        max-width: 90%;
+        padding: 8px 12px;
+        border-width: 2px;
+      }
+      #speech-bubble .speech-text {
+        font-size: 0.75rem;
+      }
+      #speech-bubble .speaker-name {
+        font-size: 0.65rem;
+      }
+      #pixel-reaction .reaction-text {
+        font-size: 0.75rem;
+        padding: 4px 12px;
+        max-width: 200px;
+      }
+      #hint-popup {
+        font-size: 0.75rem;
+        padding: 8px 16px;
+        bottom: 20%;
+      }
+      #graduation .grad-content {
+        padding: 16px 12px;
+        border-width: 4px;
+      }
+      #graduation .grad-title {
+        font-size: 1.4rem;
+      }
+      #graduation .grad-emoji {
+        font-size: 3rem;
+      }
+      #concept-modal .modal-content {
+        padding: 16px 12px;
+      }
+      #concept-modal .modal-title {
+        font-size: 1.3rem;
+      }
+      #concept-modal .concept-card .card-title {
+        font-size: 0.95rem;
+      }
+      #concept-modal .concept-card .card-desc {
+        font-size: 0.8rem;
+      }
+      .home-title {
+        font-size: 1.6rem;
+      }
+      .home-sub {
+        font-size: 0.75rem;
+        padding: 4px 12px;
+      }
+      .home-mascot .robot-emoji {
+        font-size: 3.2rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .concept-grid-home {
+        grid-template-columns: 1fr;
+        max-width: 260px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .home-mascot .speech-bubble-home {
+        font-size: 0.8rem;
+        max-width: 150px;
+        padding: 4px 10px;
+      }
+      .home-mascot .robot-emoji {
+        font-size: 2.8rem;
+      }
+      #top-bar .title {
+        font-size: 0.65rem;
+      }
+      .theme-btn, .action-btn {
+        font-size: 0.5rem;
+        padding: 2px 6px;
+      }
+      .tool-btn {
+        padding: 3px 6px;
+        min-width: 32px;
+        font-size: 0.5rem;
+      }
+      .tool-btn .tool-icon {
+        font-size: 0.8rem;
+      }
+      .tool-btn .tool-label {
+        font-size: 0.45rem;
+      }
+      #pixel-area .char-emoji {
+        font-size: 2.5rem;
+      }
+      #visitor-area .char-emoji {
+        font-size: 2.3rem;
+      }
+      #speech-bubble .speech-text {
+        font-size: 0.65rem;
+      }
+      #speech-bubble .speaker-name {
+        font-size: 0.55rem;
+      }
+      #pixel-reaction .reaction-text {
+        font-size: 0.65rem;
+        max-width: 150px;
+      }
+      .home-title {
+        font-size: 1.4rem;
+      }
+      .home-sub {
+        font-size: 0.7rem;
+      }
+    }
+
+    /* ── UTILITY ── */
+    .hidden { display: none !important; }
+    .shake { animation: shake 0.5s ease; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-14px) rotate(-4deg); }
+      40% { transform: translateX(14px) rotate(4deg); }
+      60% { transform: translateX(-10px); }
+      80% { transform: translateX(10px); }
+    }
+    .bounce { animation: bounce 0.6s ease; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-24px) scale(1.06); }
+      60% { transform: translateY(-10px); }
+    }
+    .dance { animation: dance 0.7s ease; }
+    @keyframes dance {
+      0%, 100% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-14deg) scale(1.12); }
+      75% { transform: rotate(14deg) scale(1.12); }
+    }
+    .spin { animation: spin 0.6s ease; }
+    @keyframes spin {
+      0% { transform: rotate(0deg) scale(1); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    .float-up { animation: float-up 0.8s ease forwards; }
+    @keyframes float-up {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-80px) scale(1.2); opacity: 0; }
+    }
+    .tool-glow { animation: tool-glow 0.6s ease; }
+    @keyframes tool-glow {
+      0%, 100% { box-shadow: 0 0 0 rgba(255, 215, 0, 0); }
+      50% { box-shadow: 0 0 60px rgba(255, 215, 0, 0.6); }
+    }
+    #concept-modal .modal-content::-webkit-scrollbar { width: 4px; }
+    #concept-modal .modal-content::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.02); border-radius: 10px; }
+    #concept-modal .modal-content::-webkit-scrollbar-thumb { background: #ffd700; border-radius: 10px; }
+    #concept-modal .modal-content::-webkit-scrollbar-thumb:hover { background: #fdcb6e; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- HOME SCREEN -->
+    <div id="home-screen">
+      <!-- Decorations -->
+      <span class="home-deco tree1">🌳</span>
+      <span class="home-deco tree2">🌲</span>
+      <span class="home-deco cloud1">☁️</span>
+      <span class="home-deco cloud2">⛅</span>
+      <span class="home-deco sun">☀️</span>
+      <span class="home-deco flower1">🌸</span>
+      <span class="home-deco flower2">🌼</span>
+      <span class="home-deco bush">🌿</span>
+      <span class="home-deco bush2">🌱</span>
+      <span class="home-float-emoji">✨</span>
+      <span class="home-float-emoji">🌟</span>
+      <span class="home-float-emoji">🚀</span>
+      <span class="home-float-emoji">🎮</span>
+      <span class="home-float-emoji">💡</span>
+      <span class="home-float-emoji">🧠</span>
+
+      <div class="home-content">
+        <div class="home-mascot">
+          <span class="robot-emoji">🤖</span>
+          <div class="speech-bubble-home">
+            <span class="highlight">Choose your adventure!</span> 🎯
+          </div>
+        </div>
+
+        <div class="home-title">Pixel's AI Academy</div>
+        <p class="home-sub">Learn AI concepts by helping Pixel at his help booth!<br />Each concept is a separate adventure.</p>
+
+        <div class="concept-grid-home">
+          <div class="concept-card-home playable" data-mode="retrieval">
+            <span class="level-badge">Level 1</span>
+            <span class="concept-icon">🧠🔍📚</span>
+            <div class="concept-name">Three Retrieval Modes</div>
+            <div class="concept-desc">Memory, Search, Research – choose the right tool for each visitor.</div>
+            <span class="badge-play">▶ Play</span>
+          </div>
+          <div class="concept-card-home playable" data-mode="supervised">
+            <span class="level-badge">Level 2</span>
+            <span class="concept-icon">📊</span>
+            <div class="concept-name">Supervised vs Unsupervised</div>
+            <div class="concept-desc">Labeled data vs finding patterns – which approach to use?</div>
+            <span class="badge-play">▶ Play</span>
+          </div>
+          <div class="concept-card-home playable" data-mode="reinforcement">
+            <span class="level-badge">Level 3</span>
+            <span class="concept-icon">🎮</span>
+            <div class="concept-name">Reinforcement Learning</div>
+            <div class="concept-desc">Rewards, punishments, and training agents to make decisions.</div>
+            <span class="badge-play">▶ Play</span>
+          </div>
+          <div class="concept-card-home playable" data-mode="neural">
+            <span class="level-badge">Level 4</span>
+            <span class="concept-icon">🧩</span>
+            <div class="concept-name">Neural Networks</div>
+            <div class="concept-desc">Layers, weights, and activation – how AI learns like a brain.</div>
+            <span class="badge-play">▶ Play</span>
+          </div>
+        </div>
+
+        <div class="home-footer">
+          <span>🎯 Click any playable card to start!</span>
+          <span class="key-hint">⌨️ Press <kbd>1</kbd>-<kbd>4</kbd> to launch</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen" class="hidden">
+      <!-- TOP BAR -->
+      <div id="top-bar">
+        <div class="left">
+          <button class="action-btn" id="home-btn">🏠 Home</button>
+          <div class="title">🤖 <span id="mode-title">Pixel's Booth</span></div>
+          <button class="theme-btn active-theme" data-theme="day">🌞 Day</button>
+          <button class="theme-btn" data-theme="night">🌙 Night</button>
+          <button class="theme-btn" data-theme="gaming">🎮 Gaming</button>
+        </div>
+        <div class="right">
+          <button class="action-btn" id="concept-btn">📖 Concept</button>
+          <button class="action-btn" id="hint-btn">💡 Hint</button>
+          <button class="action-btn mute" id="mute-btn">🔊</button>
+          <div id="progress-wrap">
+            <span class="dot" data-idx="0"></span>
+            <span class="dot" data-idx="1"></span>
+            <span class="dot" data-idx="2"></span>
+            <span class="dot" data-idx="3"></span>
+            <span class="dot" data-idx="4"></span>
+            <span class="dot" data-idx="5"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCENE -->
+      <div id="scene">
+        <span class="deco tree1">🌳</span>
+        <span class="deco tree2">🌲</span>
+        <span class="deco cloud1">☁️</span>
+        <span class="deco cloud2">⛅</span>
+        <span class="deco sun">☀️</span>
+        <span class="deco flower1">🌸</span>
+        <span class="deco flower2">🌼</span>
+        <span class="deco bush">🌿</span>
+        <span class="deco bush2">🌱</span>
+        <span id="booth">🏪</span>
+
+        <div id="speech-bubble" class="hidden">
+          <div class="speaker-name" id="bubble-name">Visitor</div>
+          <div class="speech-text" id="bubble-text">Hello!</div>
+        </div>
+
+        <div id="pixel-area" class="char-container">
+          <div class="char-emoji" id="pixel-emoji">🤖</div>
+          <div class="char-label">Pixel ⚡</div>
+        </div>
+
+        <div id="visitor-area" class="char-container entering">
+          <div class="char-emoji" id="visitor-emoji">🧑</div>
+          <div class="char-label" id="visitor-name">Visitor</div>
+        </div>
+
+        <div id="pixel-reaction">
+          <span id="reaction-emoji">🌟</span>
+          <span class="reaction-text" id="reaction-text">Nice!</span>
+        </div>
+
+        <div id="hint-popup">
+          <span class="hint-icon">💡</span>
+          <span id="hint-text">Pixel whispers: Think about what kind of info this needs!</span>
+        </div>
+
+        <div id="tools"></div>
+
+        <div id="graduation">
+          <div class="grad-content">
+            <span class="grad-emoji">🎓</span>
+            <div class="grad-title">Pixel Graduates!</div>
+            <div class="grad-sub" id="grad-sub">You mastered this concept! Pixel earned the</div>
+            <span class="grad-badge">🏆 Top Assistant Badge 🏆</span>
+            <div style="font-size:1.4rem;margin:8px 0;color:#2d3436;font-weight:700;">
+              🤖✨🎉
+            </div>
+            <button id="grad-replay">🔄 Play Again</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONCEPT MODAL -->
+    <div id="concept-modal">
+      <div class="modal-content">
+        <button class="close-modal" id="close-concept">✕</button>
+        <div class="modal-title" id="modal-title">🧠 Concept</div>
+        <div class="modal-sub" id="modal-sub">Pixel's guide</div>
+        <div class="concept-grid" id="modal-grid"></div>
+        <div class="pixel-advice" id="modal-advice">🤖 Pixel says: <span>Learn by doing!</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ── SOUND ENGINE ──
+      let audioCtx = null;
+      let muted = false;
+
+      function initAudio() {
+        if (!audioCtx) {
+          try {
+            audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+          } catch (_) {}
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      function playTone(freq, duration, type, vol) {
+        if (muted || !audioCtx) return;
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = type || 'sine';
+          osc.frequency.value = freq;
+          gain.gain.value = vol || 0.15;
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start();
+          osc.stop(audioCtx.currentTime + duration);
+        } catch (_) {}
+      }
+
+      function soundClick() { playTone(800, 0.08, 'sine', 0.1); }
+
+      function soundHappy() {
+        playTone(523, 0.12, 'sine', 0.12);
+        setTimeout(() => playTone(659, 0.12, 'sine', 0.12), 120);
+        setTimeout(() => playTone(784, 0.18, 'sine', 0.14), 240);
+      }
+
+      function soundBuzzer() {
+        playTone(300, 0.25, 'sawtooth', 0.08);
+        setTimeout(() => playTone(200, 0.3, 'sawtooth', 0.06), 200);
+      }
+
+      function soundEnter() { playTone(600, 0.1, 'sine', 0.06);
+        setTimeout(() => playTone(800, 0.1, 'sine', 0.06), 100); }
+
+      function soundGraduation() {
+        [0, 150, 300, 450, 600, 750].forEach((t, i) => {
+          setTimeout(() => playTone(523 + i * 40, 0.15, 'sine', 0.1), t);
+        });
+        setTimeout(() => {
+          [0, 120, 240].forEach((t, i) => {
+            setTimeout(() => playTone(784 + i * 60, 0.2, 'sine', 0.12), t);
+          });
+        }, 800);
+      }
+
+      // ── CONFIGURATIONS FOR EACH MODE ──
+      const MODES = {
+        retrieval: {
+          title: 'Three Retrieval Modes',
+          tools: [
+            { id: 'memory', icon: '🧠', label: 'Memory', cls: 'tool-memory' },
+            { id: 'search', icon: '🔍', label: 'Search', cls: 'tool-search' },
+            { id: 'research', icon: '📚', label: 'Research', cls: 'tool-research' }
+          ],
+          conceptModal: {
+            title: '🧠 The Three Retrieval Modes',
+            sub: 'Pixel\'s quick guide to choosing the right tool!',
+            cards: [
+              { icon: '🧠', title: 'Memory', desc: 'Facts that never change. Use for history, famous dates, basic science.', example: '"Who was the first person on the Moon?" → Memory' },
+              { icon: '🔍', title: 'Search', desc: 'Up‑to‑the‑minute info. Use for today\'s weather, trending news, current events.', example: '"What\'s the weather today?" → Search' },
+              { icon: '📚', title: 'Research', desc: 'Deep dive into complex topics. Use for building things, understanding systems.', example: '"How can we make cities eco‑friendly?" → Research' }
+            ],
+            advice: '🤖 Pixel says: Ask yourself: does this need recent info, old info, or deep thinking? That\'s the skill!'
+          },
+          visitors: [{
+            id: 0,
+            name: 'Sunny',
+            emoji: '🏄',
+            problem: 'What\'s the weather like today? I wanna go to the beach!',
+            correct: 'search',
+            hint: 'The weather changes every day — check what\'s current!',
+            responses: {
+              memory: { text: 'Hmm, my memory says it was sunny yesterday! 🌤️', pixelEmoji: '🤔', sound: 'buzzer' },
+              search: { text: 'Let me check... It\'s 76°F and sunny with a light breeze! Perfect beach day! 🌊☀️', pixelEmoji: '😎',
+                sound: 'happy' },
+              research: { text: 'Analyzing weather patterns... it\'s a complex climate system! 🌪️📊', pixelEmoji: '🧐',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 1,
+            name: 'Curious',
+            emoji: '🔭',
+            problem: 'Who was the first person to walk on the Moon?',
+            correct: 'memory',
+            hint: 'This is a famous piece of history — it doesn\'t change!',
+            responses: {
+              memory: { text: 'Neil Armstrong walked on the Moon in 1969! 🌙 "One small step..." 🚀', pixelEmoji: '🌟',
+                sound: 'happy' },
+              search: { text: 'Searching... lots of astronauts have been to space! 👨‍🚀👩‍🚀 Which one?', pixelEmoji: '😕',
+                sound: 'buzzer' },
+              research: { text: 'Let me study all space missions... there\'s so much data! 📖🚀', pixelEmoji: '🤯',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 2,
+            name: 'Builder',
+            emoji: '🔧',
+            problem: 'How can I build a robot just like Pixel?',
+            correct: 'research',
+            hint: 'Building something complex needs deep, detailed knowledge!',
+            responses: {
+              memory: { text: 'I remember... robots need parts! 🤖⚙️ That\'s all I\'ve got!', pixelEmoji: '😅',
+                sound: 'buzzer' },
+              search: { text: 'Quick search: there are many robot kits online! 🛒🤖 But which is best?', pixelEmoji: '🤷',
+                sound: 'buzzer' },
+              research: { text: 'Deep research: motors, sensors, microcontrollers, coding, and design! Here\'s a full guide! 📚🔧',
+                pixelEmoji: '🤓', sound: 'happy' }
+            }
+          }, {
+            id: 3,
+            name: 'Gamer',
+            emoji: '🎮',
+            problem: 'What\'s the newest game everyone\'s playing right now?',
+            correct: 'search',
+            hint: 'Trends move fast — check what\'s popular today!',
+            responses: {
+              memory: { text: 'I remember playing Pac-Man and Mario! 🕹️ Those were classics!', pixelEmoji: '😌',
+                sound: 'buzzer' },
+              search: { text: 'Let me check... "Cosmic Racers" is the #1 trending game right now! Everyone\'s playing it! 🔥🎮',
+                pixelEmoji: '😎', sound: 'happy' },
+              research: { text: 'Analyzing gaming trends... it\'s a multi-billion dollar industry with many genres! 📊🎮',
+                pixelEmoji: '🧐', sound: 'buzzer' }
+            }
+          }, {
+            id: 4,
+            name: 'Chef',
+            emoji: '🍕',
+            problem: 'What\'s the freezing point of water in Fahrenheit?',
+            correct: 'memory',
+            hint: 'This is a basic science fact — it never changes!',
+            responses: {
+              memory: { text: 'Water freezes at 32°F! ❄️ Perfect for making ice!', pixelEmoji: '😊', sound: 'happy' },
+              search: { text: 'Searching... water freezes at 32°F, but altitude can change it! 🏔️❄️', pixelEmoji: '😕',
+                sound: 'buzzer' },
+              research: { text: 'Let me study thermodynamics... it\'s a whole field of science! 🔬❄️', pixelEmoji: '🤯',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 5,
+            name: 'Eco',
+            emoji: '🌍',
+            problem: 'How can we make cities more eco-friendly and green?',
+            correct: 'research',
+            hint: 'This needs deep understanding of many systems working together!',
+            responses: {
+              memory: { text: 'I remember... cities used to be very polluted! 🏭 That\'s all I know.', pixelEmoji: '😅',
+                sound: 'buzzer' },
+              search: { text: 'Quick search: many cities are going green! 🌿 Lots of initiatives!', pixelEmoji: '🤷',
+                sound: 'buzzer' },
+              research: { text: 'Comprehensive analysis: green roofs, electric transport, vertical gardens, and recycling systems! 🌍🌱',
+                pixelEmoji: '🌟', sound: 'happy' }
+            }
+          }]
+        },
+        supervised: {
+          title: 'Supervised vs Unsupervised',
+          tools: [
+            { id: 'supervised', icon: '📊', label: 'Labeled Data', cls: 'tool-supervised' },
+            { id: 'unsupervised', icon: '🔍', label: 'Pattern Finder', cls: 'tool-unsupervised' },
+            { id: 'guess', icon: '🤷', label: 'Random Guess', cls: '' }
+          ],
+          conceptModal: {
+            title: '📊 Supervised vs Unsupervised',
+            sub: 'Two core approaches to machine learning.',
+            cards: [
+              { icon: '📊', title: 'Supervised', desc: 'Uses labeled data (input + correct output) to learn a mapping. Great for classification and regression.', example: '"I have photos labeled cat/dog. How to classify new ones?" → Supervised' },
+              { icon: '🔍', title: 'Unsupervised', desc: 'Finds hidden patterns or structures in unlabeled data. Great for clustering and dimensionality reduction.', example: '"I have customer purchase data without labels. Find groups of similar customers." → Unsupervised' },
+              { icon: '🤷', title: 'Random Guess', desc: 'Not a real method! Just a silly option to show what happens when you don\'t think.', example: 'Choosing randomly almost never works!' }
+            ],
+            advice: '🤖 Pixel says: If you have answers to learn from, use Supervised. If you\'re exploring without answers, use Unsupervised!'
+          },
+          visitors: [{
+            id: 0,
+            name: 'Data',
+            emoji: '📁',
+            problem: 'I have 10,000 photos of cats and dogs, each labeled. How do I classify new photos?',
+            correct: 'supervised',
+            hint: 'You have labels – use them to train a model!',
+            responses: {
+              supervised: { text: 'Great! I\'ll train a model using the labeled images to learn the differences. Supervised learning at work! 🐱🐶',
+                pixelEmoji: '😎', sound: 'happy' },
+              unsupervised: { text: 'Hmm, without using the labels, I can only group by visual features – but I won\'t know which is which! 🌀',
+                pixelEmoji: '😕', sound: 'buzzer' },
+              guess: { text: 'Random guess? I\'ll just flip a coin... heads dog, tails cat? That\'s not reliable! 🪙',
+                pixelEmoji: '😅', sound: 'buzzer' }
+            }
+          }, {
+            id: 1,
+            name: 'Explorer',
+            emoji: '🧭',
+            problem: 'I have customer purchase data with no labels. I want to find groups of similar buyers.',
+            correct: 'unsupervised',
+            hint: 'You have no answers – you need to find patterns yourself!',
+            responses: {
+              supervised: { text: 'Supervised needs labels – I don\'t have any here. Can\'t train a classifier without answers! 😕',
+                pixelEmoji: '😅', sound: 'buzzer' },
+              unsupervised: { text: 'Perfect! I\'ll use clustering to find natural groups in the purchase data. Unsupervised learning! 🔍',
+                pixelEmoji: '😎', sound: 'happy' },
+              guess: { text: 'Random grouping? That would just mix everyone randomly – not useful! 🎲', pixelEmoji: '🤯',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 2,
+            name: 'Builder',
+            emoji: '🏗️',
+            problem: 'I want to predict house prices based on size, location, and age. I have many examples with prices.',
+            correct: 'supervised',
+            hint: 'You have the answers (prices) – use them to learn the relationship!',
+            responses: {
+              supervised: { text: 'Yes! I\'ll use the examples to learn a regression model that predicts prices. Supervised learning! 🏠💰',
+                pixelEmoji: '😎', sound: 'happy' },
+              unsupervised: { text: 'Without using the prices, I can only cluster houses by features, but I won\'t predict prices. 😕',
+                pixelEmoji: '😕', sound: 'buzzer' },
+              guess: { text: 'Guess the price? That\'s just random – no one would trust that! 🤷', pixelEmoji: '😅',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 3,
+            name: 'Analyzer',
+            emoji: '📈',
+            problem: 'I have a huge dataset of news articles without categories. I want to automatically group them by topic.',
+            correct: 'unsupervised',
+            hint: 'You don\'t have labels – you need to discover topics from the text itself!',
+            responses: {
+              supervised: { text: 'Supervised needs labeled topics – but I don\'t have any. Can\'t train without answers! 😕',
+                pixelEmoji: '😅', sound: 'buzzer' },
+              unsupervised: { text: 'Great! I\'ll use topic modeling to find themes in the articles. Unsupervised learning! 📰🔍',
+                pixelEmoji: '😎', sound: 'happy' },
+              guess: { text: 'Random topic assignment? That would be complete nonsense! 🤪', pixelEmoji: '🤯',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 4,
+            name: 'Doctor',
+            emoji: '⚕️',
+            problem: 'I have medical records with patient symptoms and diagnoses. I want to diagnose new patients.',
+            correct: 'supervised',
+            hint: 'You have the correct diagnoses for past patients – use them!',
+            responses: {
+              supervised: { text: 'Absolutely! I\'ll train a classifier using the labeled records to predict diagnoses. Supervised learning! 🏥💉',
+                pixelEmoji: '😎', sound: 'happy' },
+              unsupervised: { text: 'Without using the diagnoses, I can only cluster symptoms, but won\'t know the diseases. 😕',
+                pixelEmoji: '😕', sound: 'buzzer' },
+              guess: { text: 'Random guess for diagnosis? That\'s dangerous and unreliable! ⚠️', pixelEmoji: '😅',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 5,
+            name: 'Marketer',
+            emoji: '📊',
+            problem: 'I have shopping data but no customer segments. I want to divide customers into groups for targeted ads.',
+            correct: 'unsupervised',
+            hint: 'You don\'t have predefined segments – you need to discover them from the data!',
+            responses: {
+              supervised: { text: 'Supervised needs known segments – I don\'t have those. Can\'t classify without labels! 😕',
+                pixelEmoji: '😅', sound: 'buzzer' },
+              unsupervised: { text: 'Perfect! I\'ll cluster customers based on their shopping behavior. Unsupervised learning! 🛍️🎯',
+                pixelEmoji: '😎', sound: 'happy' },
+              guess: { text: 'Random segmentation? That would mix up all kinds of customers – not effective! 🎲',
+                pixelEmoji: '🤯', sound: 'buzzer' }
+            }
+          }]
+        },
+        reinforcement: {
+          title: 'Reinforcement Learning',
+          tools: [
+            { id: 'reward', icon: '🎯', label: 'Reward', cls: 'tool-reward' },
+            { id: 'punish', icon: '💢', label: 'Punish', cls: 'tool-punish' },
+            { id: 'ignore', icon: '😐', label: 'Ignore', cls: 'tool-ignore' }
+          ],
+          conceptModal: {
+            title: '🎮 Reinforcement Learning',
+            sub: 'Train agents by rewarding good actions and punishing bad ones.',
+            cards: [
+              { icon: '🎯', title: 'Reward', desc: 'Give positive feedback when the agent does something right. Encourages repetition of good behavior.', example: 'Training a robot: give a treat when it turns right in a maze → Reward' },
+              { icon: '💢', title: 'Punish', desc: 'Give negative feedback when the agent does something wrong. Discourages bad actions.', example: 'Training a robot: give a mild shock when it hits a wall → Punish' },
+              { icon: '😐', title: 'Ignore', desc: 'No feedback at all. The agent doesn\'t learn anything from this action.', example: 'Doing nothing when the robot moves randomly → Ignore' }
+            ],
+            advice: '🤖 Pixel says: Reward desired behavior, punish undesired, but always be consistent! That\'s how agents learn.'
+          },
+          visitors: [{
+            id: 0,
+            name: 'Trainer',
+            emoji: '🏋️',
+            problem: 'I\'m training a robot to navigate a maze. It just turned right and found the exit! What should I do?',
+            correct: 'reward',
+            hint: 'The robot did something good – give positive feedback!',
+            responses: {
+              reward: { text: '🎉 Excellent! I\'ll give it a treat – it will remember to turn right more often! Reinforcement!',
+                pixelEmoji: '😎', sound: 'happy' },
+              punish: { text: 'Punish? It found the exit! That\'s the goal – punishing would confuse it! 😕', pixelEmoji: '😅',
+                sound: 'buzzer' },
+              ignore: { text: 'Ignore? If you don\'t give feedback, it won\'t learn that turning right is good. 😐', pixelEmoji: '🤔',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 1,
+            name: 'Racer',
+            emoji: '🏎️',
+            problem: 'My self-driving car just ran a red light. What should I do?',
+            correct: 'punish',
+            hint: 'That\'s dangerous behavior – you need to discourage it!',
+            responses: {
+              reward: { text: 'Reward? Running a red light is dangerous! That would encourage bad behavior! 🚦😱',
+                pixelEmoji: '😱', sound: 'buzzer' },
+              punish: { text: 'Yes! Give a negative signal so the car learns to stop at red lights. Punishment teaches safety! ⚠️',
+                pixelEmoji: '😎', sound: 'happy' },
+              ignore: { text: 'Ignore? If you do nothing, the car might keep doing it – that\'s risky! 😐', pixelEmoji: '😅',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 2,
+            name: 'Gamer',
+            emoji: '🎮',
+            problem: 'My AI player in a game collected a coin but then fell into a pit. What feedback should I give?',
+            correct: 'reward',
+            hint: 'Focus on the positive action first – the coin collection!',
+            responses: {
+              reward: { text: 'Give a reward for collecting the coin! It will learn that coins are good. The pit can be punished later. 🪙😊',
+                pixelEmoji: '😎', sound: 'happy' },
+              punish: { text: 'Punishing for the coin would discourage collecting coins – but coins are good! That\'s confusing. 😕',
+                pixelEmoji: '😅', sound: 'buzzer' },
+              ignore: { text: 'Ignoring the coin means the AI won\'t know collecting coins is beneficial. It might stop trying. 😐',
+                pixelEmoji: '🤔', sound: 'buzzer' }
+            }
+          }, {
+            id: 3,
+            name: 'Pet',
+            emoji: '🐕',
+            problem: 'My robot dog just sat when I said "sit" for the first time! What should I do?',
+            correct: 'reward',
+            hint: 'It obeyed a command – give positive reinforcement!',
+            responses: {
+              reward: { text: 'Yes! Give it a treat and praise – it will associate "sit" with good things. Great reinforcement! 🐶🎉',
+                pixelEmoji: '😎', sound: 'happy' },
+              punish: { text: 'Punish? It did what you asked! That would be cruel and confusing. 😢', pixelEmoji: '😅',
+                sound: 'buzzer' },
+              ignore: { text: 'Ignoring means it won\'t know it did right – it might not repeat it. 😕', pixelEmoji: '🤔',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 4,
+            name: 'Chef',
+            emoji: '🍳',
+            problem: 'My cooking robot added too much salt to a dish. How should I respond?',
+            correct: 'punish',
+            hint: 'That\'s an error – you need to correct it.',
+            responses: {
+              reward: { text: 'Reward? Too much salt ruins food! That would encourage bad cooking. 🧂😖', pixelEmoji: '😱',
+                sound: 'buzzer' },
+              punish: { text: 'Yes! Give a negative signal so it learns to use less salt. Punishment helps avoid mistakes. 🧂🚫',
+                pixelEmoji: '😎', sound: 'happy' },
+              ignore: { text: 'Ignoring means it might keep over-salting – that\'s not good! 😐', pixelEmoji: '😅',
+                sound: 'buzzer' }
+            }
+          }, {
+            id: 5,
+            name: 'Student',
+            emoji: '🧑‍🎓',
+            problem: 'My AI tutor explained a concept clearly and the student understood. What should I do?',
+            correct: 'reward',
+            hint: 'The AI did a great job – reinforce that behavior!',
+            responses: {
+              reward: { text: 'Absolutely! Reward the AI for clear explanations – it will keep doing it. Great teaching! 👨‍🏫✨',
+                pixelEmoji: '😎', sound: 'happy' },
+              punish: { text: 'Punish for explaining well? That would break the AI! 😕', pixelEmoji: '😅',
+              sound: 'buzzer' },
+              ignore: { text: 'Ignoring means the AI won\'t know it did well – it might stop being clear. 😐', pixelEmoji: '🤔',
+                sound: 'buzzer' }
+            }
+          }]
+        },
+        neural: {
+          title: 'Neural Networks',
+          tools: [
+            { id: 'layers', icon: '🧠', label: 'Add Layers', cls: 'tool-layers' },
+            { id: 'weights', icon: '⚖️', label: 'Adjust Weights', cls: 'tool-weights' },
+            { id: 'activation', icon: '🔥', label: 'Activation', cls: 'tool-activation' }
+          ],
+          conceptModal: {
+            title: '🧩 Neural Networks',
+            sub: 'How AI learns like a brain – layers, weights, and activation.',
+            cards: [
+              { icon: '🧠', title: 'Add Layers', desc: 'Adding more layers (depth) allows the network to learn more complex patterns. Too few layers = underfitting.', example: 'My AI can\'t learn complex patterns → Add Layers' },
+              { icon: '⚖️', title: 'Adjust Weights', desc: 'Weights are the connections between neurons. Adjusting them via training is how learning happens.', example: 'My AI is not adapting to the data → Adjust Weights' },
+              { icon: '🔥', title: 'Activation', desc: 'Activation functions introduce non‑linearity, enabling the network to learn non‑linear relationships.', example: 'My AI outputs are always the same (linear) → Change Activation' }
+            ],
+            advice: '🤖 Pixel says: Deep networks need layers, learning needs weight adjustments, and complexity needs activation functions!'
+          },
+          visitors: [{
+            id: 0,
+            name: 'Deep',
+            emoji: '🧬',
+            problem: 'My neural network is too shallow – it can\'t learn complex patterns in images. What should I add?',
+            correct: 'layers',
+            hint: 'More depth helps capture complex features!',
+            responses: {
+              layers: { text: 'Yes! Adding more layers creates a deeper network that can learn hierarchical features. Great for images! 📸🧠',
+                pixelEmoji: '😎', sound: 'happy' },
+              weights: { text: 'Adjusting weights is always part of training, but the core issue is depth – add layers! ⚖️',
+                pixelEmoji: '😕', sound: 'buzzer' },
+              activation: { text: 'Activation functions are important, but depth is the main problem here. Add layers! 🔥',
+                pixelEmoji: '😅', sound: 'buzzer' }
+            }
+          }, {
+            id: 1,
+            name: 'Tuner',
+            emoji: '🎛️',
+            problem: 'My network is not converging – the loss is stuck. What should I focus on?',
+            correct: 'weights',
+            hint: 'Learning depends on updating weights correctly!',
+            responses: {
+              layers: { text: 'Adding layers might help, but the immediate issue is that weights aren\'t updating well. Focus on weights! 🧠',
+                pixelEmoji: '😅', sound: 'buzzer' },
+              weights: { text: 'Exactly! Adjusting weights via backpropagation is key to reducing loss. Let\'s tune them! ⚖️📉',
+                pixelEmoji: '😎', sound: 'happy' },
+              activation: { text: 'Activation functions matter, but if the loss is stuck, often the optimizer or weights are the issue. 🔥',
+                pixelEmoji: '🤔', sound: 'buzzer' }
+            }
+          }, {
+            id: 2,
+            name: 'Scientist',
+            emoji: '🔬',
+            problem: 'My network outputs almost the same value for all inputs – it\'s too linear. What\'s missing?',
+            correct: 'activation',
+            hint: 'You need non‑linearity to separate complex data!',
+            responses: {
+              layers: { text: 'Adding layers without non‑linearity won\'t help – it\'s still linear! You need activation functions. 🧠',
+                pixelEmoji: '😅', sound: 'buzzer' },
+              weights: { text: 'Adjusting weights in a linear network still gives linear outputs. You need activation! ⚖️',
+                pixelEmoji: '😕', sound: 'buzzer' },
+              activation: { text: 'Yes! Activation functions like ReLU or sigmoid introduce non‑linearity, allowing complex decision boundaries. 🔥💡',
+                pixelEmoji: '😎', sound: 'happy' }
+            }
+          }, {
+            id: 3,
+            name: 'Architect',
+            emoji: '🏛️',
+            problem: 'My network is overfitting – it memorizes training data but fails on new data. What should I do?',
+            correct: 'layers',
+            hint: 'Sometimes depth can help if you add regularization, but let\'s pick the most relevant: add layers with care.',
+            responses: {
+              layers: { text: 'You can add more layers and also use dropout to prevent overfitting. It\'s a common fix! 🧠🧩',
+                pixelEmoji: '😎', sound: 'happy' },
+              weights: { text: 'Adjusting weights is always part of training, but overfitting is about complexity – consider layers and regularization. ⚖️',
+                pixelEmoji: '😕', sound: 'buzzer' },
+              activation: { text: 'Activation functions don\'t directly fix overfitting – that\'s about model capacity and regularization. 🔥',
+                pixelEmoji: '😅', sound: 'buzzer' }
+            }
+          }, {
+            id: 4,
+            name: 'Optimizer',
+            emoji: '⚡',
+            problem: 'Training is very slow – the loss decreases very slowly. What could help speed it up?',
+            correct: 'weights',
+            hint: 'Faster learning often comes from better weight updates!',
+            responses: {
+              layers: { text: 'Adding more layers could make it slower, not faster. Focus on weights and learning rate. 🧠',
+                pixelEmoji: '😅', sound: 'buzzer' },
+              weights: { text: 'Yes! Using a better weight initialization or adaptive optimizer can speed up convergence. Let\'s adjust! ⚖️🚀',
+                pixelEmoji: '😎', sound: 'happy' },
+              activation: { text: 'Activation functions affect gradients, but speed often depends on weights and optimizer. 🔥',
+                pixelEmoji: '🤔', sound: 'buzzer' }
+            }
+          }, {
+            id: 5,
+            name: 'Explainer',
+            emoji: '🗣️',
+            problem: 'My network gives good results but I don\'t understand why. What can I add to interpret it?',
+            correct: 'activation',
+            hint: 'Visualizing activations can help understand what the network sees!',
+            responses: {
+              layers: { text: 'Looking at layer outputs can help, but activation maps are more direct. 🧠', pixelEmoji: '😕',
+                sound: 'buzzer' },
+              weights: { text: 'Weights alone are hard to interpret – you need to see activations. ⚖️', pixelEmoji: '😅',
+                sound: 'buzzer' },
+              activation: { text: 'Yes! Visualizing activation maps shows which parts of the input the network focuses on. Great for interpretability! 🔥👀',
+                pixelEmoji: '😎', sound: 'happy' }
+            }
+          }]
+        }
+      };
+
+      // ── STATE ──
+      let currentMode = 'retrieval';
+      let visitorIndex = 0;
+      let phase = 'idle';
+      let busy = false;
+      let visited = new Set();
+      let hintShowing = false;
+      let hintTimer = null;
+
+      // ── DOM REFS ──
+      const $ = id => document.getElementById(id);
+      const homeScreen = $('home-screen');
+      const gameScreen = $('game-screen');
+      const homeBtn = $('home-btn');
+      const modeTitle = $('mode-title');
+      const scene = $('scene');
+      const pixelEmoji = $('pixel-emoji');
+      const visitorArea = $('visitor-area');
+      const visitorEmoji = $('visitor-emoji');
+      const visitorName = $('visitor-name');
+      const speechBubble = $('speech-bubble');
+      const bubbleName = $('bubble-name');
+      const bubbleText = $('bubble-text');
+      const toolsContainer = $('tools');
+      const progressDots = document.querySelectorAll('.dot');
+      const reactionEl = $('pixel-reaction');
+      const reactionEmoji = $('reaction-emoji');
+      const reactionText = $('reaction-text');
+      const hintPopup = $('hint-popup');
+      const hintText = $('hint-text');
+      const graduation = $('graduation');
+      const gradReplay = $('grad-replay');
+      const gradSub = $('grad-sub');
+      const muteBtn = $('mute-btn');
+      const hintBtn = $('hint-btn');
+      const conceptBtn = $('concept-btn');
+      const conceptModal = $('concept-modal');
+      const closeConcept = $('close-concept');
+      const modalTitle = $('modal-title');
+      const modalSub = $('modal-sub');
+      const modalGrid = $('modal-grid');
+      const modalAdvice = $('modal-advice');
+
+      // ── NAVIGATION ──
+      function showHome() {
+        gameScreen.classList.add('hidden');
+        homeScreen.classList.remove('hidden');
+        resetGameState();
+        document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+        graduation.classList.remove('show');
+      }
+
+      function showGame(mode) {
+        currentMode = mode;
+        homeScreen.classList.add('hidden');
+        gameScreen.classList.remove('hidden');
+        loadMode(mode);
+        resetGameState();
+        setTimeout(() => showVisitor(0), 400);
+      }
+
+      // ── LOAD MODE ──
+      function loadMode(mode) {
+        const config = MODES[mode];
+        if (!config) return;
+        modeTitle.textContent = config.title;
+        toolsContainer.innerHTML = '';
+        config.tools.forEach(tool => {
+          const btn = document.createElement('button');
+          btn.className = `tool-btn ${tool.cls || ''}`;
+          btn.dataset.tool = tool.id;
+          btn.innerHTML = `<span class="tool-icon">${tool.icon}</span><span class="tool-label">${tool.label}</span>`;
+          toolsContainer.appendChild(btn);
+        });
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (busy || phase === 'graduation') return;
+            if (this.classList.contains('disabled')) return;
+            handleTool(this.dataset.tool);
+          });
+          btn.addEventListener('touchstart', function() {
+            this.style.transform = 'scale(0.92)';
+          }, { passive: true });
+          btn.addEventListener('touchend', function() {
+            this.style.transform = '';
+          }, { passive: true });
+        });
+        const visitorCount = config.visitors.length;
+        progressDots.forEach((dot, i) => {
+          if (i < visitorCount) {
+            dot.style.display = 'inline-block';
+          } else {
+            dot.style.display = 'none';
+          }
+        });
+        const cm = config.conceptModal;
+        modalTitle.textContent = cm.title;
+        modalSub.textContent = cm.sub;
+        modalGrid.innerHTML = '';
+        cm.cards.forEach(card => {
+          const div = document.createElement('div');
+          div.className = 'concept-card';
+          div.innerHTML = `
+            <div class="card-title">${card.icon} ${card.title}</div>
+            <div class="card-desc">${card.desc}</div>
+            <div class="card-example">${card.example}</div>
+          `;
+          modalGrid.appendChild(div);
+        });
+        modalAdvice.innerHTML = cm.advice;
+      }
+
+      // ── RESET STATE ──
+      function resetGameState() {
+        visitorIndex = 0;
+        visited = new Set();
+        busy = false;
+        phase = 'idle';
+        hintShowing = false;
+        clearTimeout(hintTimer);
+        document.querySelectorAll('.tool-btn').forEach(t => t.classList.remove('disabled'));
+        progressDots.forEach(d => d.classList.remove('done', 'current'));
+        visitorArea.classList.remove('entered', 'leaving', 'shake', 'bounce', 'dance');
+        visitorArea.classList.add('entering');
+        pixelEmoji.textContent = '🤖';
+        reactionEl.classList.remove('show');
+        speechBubble.classList.add('hidden');
+        hintPopup.classList.remove('show');
+        visitorEmoji.textContent = '🧑';
+        visitorName.textContent = 'Visitor';
+        graduation.classList.remove('show');
+        document.querySelectorAll('.confetti-piece').forEach(el => el.remove());
+      }
+
+      function getConfig() { return MODES[currentMode]; }
+
+      function getVisitors() { return getConfig().visitors; }
+
+      // ── SHOW VISITOR ──
+      function showVisitor(index) {
+        const visitors = getVisitors();
+        const v = visitors[index];
+        if (!v) {
+          showGraduation();
+          return;
+        }
+        phase = 'showing';
+        busy = false;
+        updateProgress();
+
+        visitorArea.classList.remove('entered', 'leaving', 'shake', 'bounce', 'dance');
+        visitorArea.classList.add('entering');
+        visitorEmoji.textContent = v.emoji;
+        visitorName.textContent = v.name + ' 🌟';
+
+        pixelEmoji.textContent = '🤖';
+        pixelEmoji.classList.remove('shake', 'bounce', 'dance', 'spin');
+
+        reactionEl.classList.remove('show');
+        speechBubble.classList.add('hidden');
+
+        document.querySelectorAll('.tool-btn').forEach(t => t.classList.remove('disabled'));
+
+        requestAnimationFrame(() => {
+          visitorArea.classList.remove('entering');
+          visitorArea.classList.add('entered');
+          soundEnter();
+        });
+
+        setTimeout(() => {
+          bubbleName.textContent = v.name + ' 🗣️';
+          bubbleText.textContent = v.problem;
+          bubbleText.classList.remove('small');
+          speechBubble.classList.remove('hidden');
+          phase = 'idle';
+          clearTimeout(hintTimer);
+          hintTimer = setTimeout(() => {
+            if (phase === 'idle' && !hintShowing) {
+              showHint(v.hint);
+            }
+          }, 7000);
+        }, 600);
+      }
+
+      function updateProgress() {
+        const visitors = getVisitors();
+        progressDots.forEach((dot, i) => {
+          if (i < visitors.length) {
+            dot.style.display = 'inline-block';
+            dot.classList.remove('done', 'current');
+            if (i < visitorIndex) dot.classList.add('done');
+            else if (i === visitorIndex && phase !== 'graduation') dot.classList.add('current');
+          } else {
+            dot.style.display = 'none';
+          }
+        });
+      }
+
+      function showHint(text) {
+        if (hintShowing) return;
+        hintShowing = true;
+        hintText.textContent = '💡 Pixel whispers: ' + text;
+        hintPopup.classList.add('show');
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(() => {
+          hintPopup.classList.remove('show');
+          hintShowing = false;
+        }, 4000);
+      }
+
+      function handleTool(toolId) {
+        const visitors = getVisitors();
+        const v = visitors[visitorIndex];
+        if (!v) return;
+        if (busy) return;
+        busy = true;
+        phase = 'reacting';
+
+        document.querySelectorAll('.tool-btn').forEach(t => t.classList.add('disabled'));
+        hintPopup.classList.remove('show');
+        hintShowing = false;
+        clearTimeout(hintTimer);
+        soundClick();
+
+        const resp = v.responses[toolId];
+        if (!resp) {
+          busy = false;
+          phase = 'idle';
+          document.querySelectorAll('.tool-btn').forEach(t => t.classList.remove('disabled'));
+          return;
+        }
+
+        const isCorrect = (toolId === v.correct);
+        pixelEmoji.textContent = resp.pixelEmoji || '🤖';
+        reactionEmoji.textContent = isCorrect ? '🌟' : '😅';
+        reactionText.textContent = resp.text;
+        reactionEl.classList.add('show');
+
+        visitorEmoji.classList.remove('shake', 'bounce', 'dance', 'spin');
+        if (isCorrect) {
+          visitorEmoji.classList.add('dance');
+          setTimeout(() => { visitorEmoji.textContent = '😄'; }, 200);
+          setTimeout(() => { visitorEmoji.textContent = v.emoji; }, 800);
+          soundHappy();
+          setTimeout(() => { pixelEmoji.textContent = '😎'; }, 300);
+        } else {
+          visitorEmoji.classList.add('shake');
+          setTimeout(() => { visitorEmoji.textContent = '😕'; }, 200);
+          setTimeout(() => { visitorEmoji.textContent = v.emoji; }, 800);
+          soundBuzzer();
+          setTimeout(() => { pixelEmoji.textContent = '😅'; }, 300);
+        }
+
+        bubbleName.textContent = '🤖 Pixel';
+        bubbleText.textContent = resp.text;
+        bubbleText.classList.add('small');
+        speechBubble.classList.remove('hidden');
+
+        if (isCorrect) {
+          visited.add(visitorIndex);
+          updateProgress();
+        }
+
+        const delay = isCorrect ? 3000 : 3200;
+        setTimeout(() => {
+          reactionEl.classList.remove('show');
+          pixelEmoji.textContent = '🤖';
+
+          if (isCorrect) {
+            visitorIndex++;
+            if (visitorIndex >= visitors.length) {
+              showGraduation();
+            } else {
+              showVisitor(visitorIndex);
+            }
+          } else {
+            busy = false;
+            phase = 'idle';
+            document.querySelectorAll('.tool-btn').forEach(t => t.classList.remove('disabled'));
+            setTimeout(() => {
+              if (phase === 'idle' && !hintShowing) {
+                showHint(v.hint);
+              }
+            }, 2500);
+            visitorEmoji.textContent = v.emoji;
+            setTimeout(() => {
+              bubbleName.textContent = v.name + ' 🗣️';
+              bubbleText.textContent = v.problem;
+              bubbleText.classList.remove('small');
+            }, 400);
+          }
+        }, delay);
+      }
+
+      function showGraduation() {
+        phase = 'graduation';
+        busy = true;
+        document.querySelectorAll('.tool-btn').forEach(t => t.classList.add('disabled'));
+        speechBubble.classList.add('hidden');
+        visitorArea.classList.add('leaving');
+        progressDots.forEach(d => d.classList.remove('current'));
+        progressDots.forEach(d => d.classList.add('done'));
+
+        pixelEmoji.textContent = '🥳';
+        setTimeout(() => { pixelEmoji.textContent = '🎓'; }, 400);
+
+        gradSub.textContent = 'You mastered "' + getConfig().title + '"! Pixel earned the';
+        soundGraduation();
+
+        setTimeout(() => {
+          graduation.classList.add('show');
+          launchConfetti();
+          setTimeout(launchConfetti, 800);
+          setTimeout(launchConfetti, 1600);
+        }, 800);
+      }
+
+      function launchConfetti() {
+        const emojis = ['🎉', '🎊', '⭐', '🌟', '✨', '🌈', '🎈', '🎁', '💫', '🎆', '🎇'];
+        for (let i = 0; i < 30; i++) {
+          const el = document.createElement('div');
+          el.className = 'confetti-piece';
+          el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          el.style.left = Math.random() * 100 + '%';
+          el.style.top = '-10%';
+          el.style.fontSize = (1.2 + Math.random() * 1.8) + 'rem';
+          el.style.animationDuration = (2 + Math.random() * 2) + 's';
+          el.style.animationDelay = (Math.random() * 0.8) + 's';
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 5000);
+        }
+      }
+
+      gradReplay.addEventListener('click', () => {
+        resetGameState();
+        setTimeout(() => showVisitor(0), 400);
+      });
+
+      document.querySelectorAll('.concept-card-home').forEach(card => {
+        card.addEventListener('click', () => {
+          const mode = card.dataset.mode;
+          if (mode && MODES[mode]) {
+            showGame(mode);
+          }
+        });
+      });
+
+      homeBtn.addEventListener('click', showHome);
+
+      // ── THEME ──
+      let currentTheme = 'day';
+
+      function setTheme(theme) {
+        document.body.classList.remove('theme-night', 'theme-gaming', 'theme-day');
+        if (theme !== 'day') document.body.classList.add('theme-' + theme);
+        currentTheme = theme;
+        document.querySelectorAll('.theme-btn').forEach(b => {
+          b.classList.toggle('active-theme', b.dataset.theme === theme);
+        });
+        const suns = document.querySelectorAll('.sun, .home-deco.sun, .deco.sun');
+        const clouds = document.querySelectorAll('.cloud1, .cloud2, .home-deco.cloud1, .home-deco.cloud2, .deco.cloud1, .deco.cloud2');
+        const emoji = theme === 'night' ? '🌙' : (theme === 'gaming' ? '🕹️' : '☀️');
+        suns.forEach(el => { if (el) el.textContent = emoji; });
+        clouds.forEach(el => { if (el) el.textContent = emoji; });
+      }
+
+      document.querySelectorAll('.theme-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setTheme(btn.dataset.theme);
+        });
+      });
+
+      muteBtn.addEventListener('click', () => {
+        muted = !muted;
+        muteBtn.textContent = muted ? '🔇' : '🔊';
+      });
+
+      conceptBtn.addEventListener('click', () => {
+        conceptModal.classList.add('show');
+      });
+      closeConcept.addEventListener('click', () => {
+        conceptModal.classList.remove('show');
+      });
+      conceptModal.addEventListener('click', (e) => {
+        if (e.target === conceptModal) conceptModal.classList.remove('show');
+      });
+
+      hintBtn.addEventListener('click', () => {
+        if (busy || phase === 'graduation') return;
+        const visitors = getVisitors();
+        const v = visitors[visitorIndex];
+        if (!v) return;
+        showHint(v.hint);
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (!gameScreen.classList.contains('hidden')) {
+          if (e.key === '1') {
+            const btn = document.querySelector('.tool-btn:first-child');
+            if (btn && !btn.classList.contains('disabled')) btn.click();
+          } else if (e.key === '2') {
+            const btns = document.querySelectorAll('.tool-btn');
+            if (btns.length > 1 && !btns[1].classList.contains('disabled')) btns[1].click();
+          } else if (e.key === '3') {
+            const btns = document.querySelectorAll('.tool-btn');
+            if (btns.length > 2 && !btns[2].classList.contains('disabled')) btns[2].click();
+          } else if (e.key === 'h' || e.key === 'H') {
+            hintBtn.click();
+          } else if (e.key === 'm' || e.key === 'M') {
+            muteBtn.click();
+          } else if (e.key === 'c' || e.key === 'C') {
+            conceptBtn.click();
+          } else if (e.key === 'Escape') {
+            if (conceptModal.classList.contains('show')) {
+              conceptModal.classList.remove('show');
+            } else {
+              showHome();
+            }
+          }
+        } else {
+          const cards = document.querySelectorAll('.concept-card-home.playable');
+          if (e.key >= '1' && e.key <= '4') {
+            const idx = parseInt(e.key) - 1;
+            if (cards[idx]) cards[idx].click();
+          }
+          if (e.key === 'Enter' || e.key === ' ') {
+            const first = document.querySelector('.concept-card-home.playable');
+            if (first) first.click();
+          }
+        }
+      });
+
+      function init() {
+        setTheme('day');
+        homeScreen.classList.remove('hidden');
+        gameScreen.classList.add('hidden');
+        loadMode('retrieval');
+        document.addEventListener('click', () => initAudio(), { once: true });
+        document.addEventListener('touchstart', () => initAudio(), { once: true });
+      }
+
+      init();
+
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const bw = speechBubble.offsetWidth;
+          if (bw > window.innerWidth * 0.9) {
+            speechBubble.style.maxWidth = (window.innerWidth * 0.85) + 'px';
+          } else {
+            speechBubble.style.maxWidth = '';
+          }
+        }, 200);
+      });
+
+    })();
+  </script>
+</body>
+</html>
